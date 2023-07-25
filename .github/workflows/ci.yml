@@ -23,8 +23,9 @@ jobs:
       - name: Create Virtual Environment
         working-directory: ./src
         run: |
-          python -m venv virtualenv
-          source virtualenv/bin/activate && pip install -r requirements.txt
+            pip install --upgrade virtualenv
+            virtualenv -p python3 virtualenv
+            source virtualenv/bin/activate && pip install -r requirements.txt
 
       - name: Zip Source Code
         run: |
