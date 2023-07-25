@@ -3,7 +3,7 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - develop  # Adjust this to match your main branch name
+      - develop
       - master
 
 jobs:
@@ -14,40 +14,30 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-      
+
       - name: Setup python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Create Virtual Environment
         working-directory: ./src
         run: |
           python -m venv virtualenv
-          source virtualenv/bin/activate && pip install -r requirements.txt 
+          source virtualenv/bin/activate && pip install -r requirements.txt
 
       - name: Zip Source Code
         run: |
           cd src && zip -r ../src.zip . && cd ..
-      
-      - name: Change to Terraform Directory
-        run: |
-          cd terraform
-
-      - name: List Terraform Directory
-        working-directory: ./terraform
-        run: |
-          ls -la
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: "1.3.9" 
+          terraform_version: "1.3.9"
 
       - name: Terraform Init
         working-directory: ./terraform
         run: terraform init
-
 
       - name: Terraform Validate
         id: validate
@@ -59,10 +49,10 @@ jobs:
         working-directory: ./terraform
         run: |
           terraform plan -var api_key=${{ secrets.IBM_CLOUD_API_KEY }} -var namespace=${{ secrets.IBM_FAAS_NAMESPACE }}
-      
+
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master'
         id: apply
         working-directory: ./terraform
         run: |
-          terraform apply -var api_key=${{ secrets.IBM_CLOUD_API_KEY }} -var namespace=${{ secrets.IBM_FAAS_NAMESPACE }}
+          terraform apply -var api_key=${{ secrets.IBM_CLOUD_API_KEY }} -var namespace=${{ secrets.IBM_FAAS_NAMESPACE }} -auto-approve
