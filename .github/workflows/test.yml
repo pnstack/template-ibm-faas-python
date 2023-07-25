@@ -13,6 +13,16 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+      
+      - name: Setup python
+        uses: actions/setup-python
+        with:
+          python-version: '3.11'
+
+      - name: Create Virtual Environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate && pip install -r requirements.txt 
 
       - name: Zip Source Code
         run: |
@@ -47,16 +57,3 @@ jobs:
         working-directory: ./terraform
         run: |
           terraform plan -var api_key=${{ secrets.IBM_CLOUD_API_KEY }} -var namespace=${{ secrets.IBM_FAAS_NAMESPACE }}
-
-      # - name: Terraform Apply
-      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      #   run: terraform apply tfplan
-      #   env:
-      #     IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}  # Add the secret containing your IBM Cloud API key
-
-      # - name: Clean Up
-      #   if: always()
-      #   run: |
-      #     rm -f tfplan
-      #     rm -f src.zip
-      #     rm -f ./function
