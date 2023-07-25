@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy with Terraform
+    name: Test Terraform Deployment
     runs-on: ubuntu-latest
 
     steps:
@@ -20,6 +20,7 @@ jobs:
           python-version: '3.11'
 
       - name: Create Virtual Environment
+        working-directory: ./src
         run: |
           python -m venv venv
           source venv/bin/activate && pip install -r requirements.txt 
