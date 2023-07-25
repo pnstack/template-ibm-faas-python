@@ -1,13 +1,14 @@
-name: Test Terraform Deployment
+name: CI Pipeline
 
 on:
   push:
     branches:
       - develop  # Adjust this to match your main branch name
+      - master
 
 jobs:
   deploy:
-    name: Test Terraform Deployment
+    name: CI Pipeline
     runs-on: ubuntu-latest
 
     steps:
@@ -22,8 +23,8 @@ jobs:
       - name: Create Virtual Environment
         working-directory: ./src
         run: |
-          python -m venv venv
-          source venv/bin/activate && pip install -r requirements.txt 
+          python -m venv virtualenv
+          source virtualenv/bin/activate && pip install -r requirements.txt 
 
       - name: Zip Source Code
         run: |
@@ -58,3 +59,10 @@ jobs:
         working-directory: ./terraform
         run: |
           terraform plan -var api_key=${{ secrets.IBM_CLOUD_API_KEY }} -var namespace=${{ secrets.IBM_FAAS_NAMESPACE }}
+      
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/master'
+        id: apply
+        working-directory: ./terraform
+        run: |
+          terraform apply -var api_key=${{ secrets.IBM_CLOUD_API_KEY }} -var namespace=${{ secrets.IBM_FAAS_NAMESPACE }}
